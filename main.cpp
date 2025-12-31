@@ -1,37 +1,49 @@
 #include "mainwindow.h"
-#include "databasemanager.h"  // 添加这行
+#include "databasemanager.h"
+#include "historymodel.h"  // 添加这行
 #include <QApplication>
 #include <QDebug>
+#include <QTableView>  // 用于测试显示
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    // 测试数据库功能
     qDebug() << "=== 测试数据库功能 ===";
 
-    // 1. 获取数据库实例（会自动初始化）
+    // 1. 测试数据库功能
     DatabaseManager& db = DatabaseManager::getInstance();
 
-    // 2. 测试添加历史记录
-    bool success = db.addHistory("hello", "你好", "en", "zh");
-    qDebug() << "添加历史记录:" << (success ? "success" : "fail");
+    // 添加一些测试数据
+    db.addHistory("hello", "你好", "en", "zh");
+    db.addHistory("world", "周霖營", "en", "zh");
+    db.addHistory("thank you", "慢走", "en", "zh");
+    db.addHistory("goodbye", "不送", "en", "zh");
 
-    success = db.addHistory("world", "周霖營", "en", "zh");
-    qDebug() << "添加历史记录:" << (success ? "success" : "fail");
+    // 2. 测试HistoryModel
+    qDebug() << "\n=== 测试HistoryModel ===";
+    HistoryModel model;
 
-    // 3. 测试查询历史记录
-    QVector<HistoryRecord> history = db.getHistory(10);
-    qDebug() << "查询到" << history.size() << "条历史记录:";
+    qDebug() << "模型行数:" << model.rowCount();
+    qDebug() << "模型列数:" << model.columnCount();
 
-    for (const auto& record : history) {
-        qDebug() << "[" << record.timestamp << "]"
-                 << record.word << "->" << record.translation
-                 << "(" << record.sourceLang << "->" << record.targetLang << ")";
+    // 测试数据访问
+    if (model.rowCount() > 0) {
+        QModelIndex index = model.index(0, 0);  // 第一行第一列
+        QString word = model.data(index, Qt::DisplayRole).toString();
+        qDebug() << "第一行单词:" << word;
+
+        index = model.index(0, 1);  // 第一行第二列
+        QString translation = model.data(index, Qt::DisplayRole).toString();
+        qDebug() << "第一行翻译:" << translation;
     }
 
-    // 4. 测试清空历史记录（可以先注释掉，以便查看数据）
-    // db.clearHistory();
+    // 3. 简单测试TableView显示（可选）
+    QTableView tableView;
+    tableView.setModel(&model);
+    tableView.setWindowTitle("历史记录测试");
+    tableView.resize(600, 300);
+    tableView.show();
 
     MainWindow w;
     w.show();
