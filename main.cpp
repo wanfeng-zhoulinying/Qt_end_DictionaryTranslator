@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
                      });
 
     // 测试翻译
-    networkManager.translateText("hello world", "en", "zh");
+    networkManager.translateText("THe flower is very beautiful", "en", "zh");
 
     MainWindow w;
     w.show();
