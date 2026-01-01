@@ -1,49 +1,40 @@
 #include "mainwindow.h"
 #include "databasemanager.h"
-#include "historymodel.h"  // 添加这行
+#include "historymodel.h"
+#include "networkmanager.h"  // 添加这行
 #include <QApplication>
 #include <QDebug>
-#include <QTableView>  // 用于测试显示
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    qDebug() << "=== 测试数据库功能 ===";
+    qDebug() << "=== 测试网络翻译功能 ===";
 
-    // 1. 测试数据库功能
-    DatabaseManager& db = DatabaseManager::getInstance();
+    // 创建网络管理器实例
+    NetworkManager networkManager;
 
-    // 添加一些测试数据
-    db.addHistory("hello", "你好", "en", "zh");
-    db.addHistory("world", "周霖營", "en", "zh");
-    db.addHistory("thank you", "慢走", "en", "zh");
-    db.addHistory("goodbye", "不送", "en", "zh");
+    // 连接翻译完成信号
+    QObject::connect(&networkManager, &NetworkManager::translationFinished,
+                     [](const QString &original, const QString &translated,
+                        const QString &from, const QString &to) {
+                         qDebug() << "翻译成功:";
+                         qDebug() << "原文:" << original;
+                         qDebug() << "译文:" << translated;
+                         qDebug() << "语言:" << from << "->" << to;
 
-    // 2. 测试HistoryModel
-    qDebug() << "\n=== 测试HistoryModel ===";
-    HistoryModel model;
+                         // 测试：将结果保存到数据库
+                         DatabaseManager::getInstance().addHistory(original, translated, from, to);
+                     });
 
-    qDebug() << "模型行数:" << model.rowCount();
-    qDebug() << "模型列数:" << model.columnCount();
+    // 连接错误信号
+    QObject::connect(&networkManager, &NetworkManager::translationError,
+                     [](const QString &error) {
+                         qDebug() << "翻译错误:" << error;
+                     });
 
-    // 测试数据访问
-    if (model.rowCount() > 0) {
-        QModelIndex index = model.index(0, 0);  // 第一行第一列
-        QString word = model.data(index, Qt::DisplayRole).toString();
-        qDebug() << "第一行单词:" << word;
-
-        index = model.index(0, 1);  // 第一行第二列
-        QString translation = model.data(index, Qt::DisplayRole).toString();
-        qDebug() << "第一行翻译:" << translation;
-    }
-
-    // 3. 简单测试TableView显示（可选）
-    QTableView tableView;
-    tableView.setModel(&model);
-    tableView.setWindowTitle("历史记录测试");
-    tableView.resize(600, 300);
-    tableView.show();
+    // 测试翻译
+    networkManager.translateText("hello world", "en", "zh");
 
     MainWindow w;
     w.show();
