@@ -1,7 +1,7 @@
 {
     "baidu_translate": {
-        "app_id": "你的百度APPID",
-        "secret_key": "你的百度密钥"
+        "app_id": "20251231002530938",
+        "secret_key": "6tTL_UFrjLn34attrbYL"
     },
     "app_config": {
         "database_path": "dictionary.db",

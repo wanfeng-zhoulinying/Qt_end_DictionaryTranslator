@@ -11,6 +11,7 @@
 #include <QCryptographicHash>
 #include <QDateTime>
 #include <QDebug>
+#include <QCoreApplication>
 
 
 NetworkManager::NetworkManager(QObject *parent)
@@ -55,8 +56,8 @@ QString NetworkManager::buildBaiduRequest(const QString &text,
                                           const QString &from,
                                           const QString &to)
 {
-    // 从config.json读取配置
-    QFile configFile("config.json");
+    QString configPath = QCoreApplication::applicationDirPath() + "/../../../config.json";
+    QFile configFile(configPath);
     if (!configFile.open(QIODevice::ReadOnly)) {
         qDebug() << "无法打开配置文件 config.json";
         qDebug() << "请在同级目录创建config.json文件，格式参考：";
