@@ -1,0 +1,16 @@
+{
+    "baidu_translate": {
+        "app_id": "你的百度APPID",
+        "secret_key": "你的百度密钥"
+    },
+    "app_config": {
+        "database_path": "dictionary.db",
+        "cache_enabled": true,
+        "max_history_records": 100
+    },
+    "translation_settings": {
+        "default_source_lang": "auto",
+        "default_target_lang": "zh",
+        "timeout_ms": 5000
+    }
+}
